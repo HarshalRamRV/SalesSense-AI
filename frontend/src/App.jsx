@@ -1,34 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaPaperPlane } from 'react-icons/fa';
 import './App.css';
 
 const App = () => {
   const [query, setQuery] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
+  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    const fetchChatHistory = async () => {
+      try {
+        const result = await axios.get('http://localhost:5000/api/chat-history');
+        setChatHistory(result.data);
+      } catch (error) {
+        console.error('Error fetching chat history:', error);
+      }
+    };
+
+    fetchChatHistory();
+  }, []);
 
   const sendQuery = async () => {
     if (!query) return;
-
-    const newMessage = { type: 'user', text: query };
-    setChatHistory([...chatHistory, newMessage]);
 
     setLoading(true);
 
     try {
       const response = await axios.post('http://localhost:5000/api/query', { query });
-      const { gpt_response, sql_result } = response.data;
+      const { sql_result } = response.data;
 
-      const gptMessage = { type: 'bot', text: gpt_response || 'No response from GPT' };
-      const sqlMessages = sql_result && Array.isArray(sql_result) 
-        ? [{ type: 'bot', content: sql_result }] 
-        : [];
+      const sqlResultString = JSON.stringify(sql_result);
 
-      setChatHistory([...chatHistory, newMessage, gptMessage, ...sqlMessages]);
+      setChatHistory((prevHistory) => [
+        ...prevHistory,
+        { user_message: query, bot_message: sqlResultString, timestamp: new Date().toISOString() }
+      ]);
+      setResponse({
+        sqlMessages: sql_result || []
+      });
     } catch (error) {
-      const errorMessage = { type: 'bot', text: 'Error fetching response. Please try again.' };
-      setChatHistory([...chatHistory, newMessage, errorMessage]);
+      setResponse({
+        sqlMessages: []
+      });
     }
 
     setLoading(false);
@@ -75,16 +90,32 @@ const App = () => {
       </header>
 
       <div className="chat-box">
-        {loading && <div className="typing-indicator">Bot is typing...</div>}
-        {chatHistory.map((message, index) => (
-          <div
-            key={index}
-            className={`message ${message.type === 'user' ? 'user-message' : 'bot-message'}`}
-          >
-            {message.text}
-            {message.content && renderTable(message.content)}
+        {chatHistory.map((chat, index) => (
+          <div key={index} className="message-container">
+            <div className="message user-message">
+              {chat.user_message}
+              <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
+            </div>
+
+            {chat.bot_message && (
+              <div className="message bot-message">
+                {(() => {
+                  try {
+                    const cleanedMessage = chat.bot_message.replace(/'/g, '"'); // Replace single quotes with double quotes
+                    const parsedMessage = JSON.parse(cleanedMessage);
+                    return Array.isArray(parsedMessage) ? renderTable(parsedMessage) : parsedMessage;
+                  } catch (error) {
+                    console.error('Error parsing bot message:', error);
+                    return chat.bot_message; // Display the raw message if parsing fails
+                  }
+                })()}
+                <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
+              </div>
+            )}
           </div>
         ))}
+
+        {loading && <div className="typing-indicator">Bot is typing...</div>}
       </div>
 
       <div className="input-box">
