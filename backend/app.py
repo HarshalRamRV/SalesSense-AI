@@ -14,7 +14,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_path)
 # Database connection function
 def query_db(query):
     try:
-        conn = sqlite3.connect('sales_data.db')
+        conn = sqlite3.connect('../database/sales.db')
         cursor = conn.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -39,7 +39,7 @@ def generate_sql_and_fetch_data():
     "product_name" text, 
     "quantity" int, 
     "price" real, 
-    "sales_date" text, 
+    "sales_date" date, 
     primary key: "id"
     """
 

@@ -6,64 +6,83 @@ import './App.css';
 const App = () => {
   const [query, setQuery] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Function to handle sending query to the backend
   const sendQuery = async () => {
     if (!query) return;
 
-    // Append user message to the chat history
     const newMessage = { type: 'user', text: query };
     setChatHistory([...chatHistory, newMessage]);
 
+    setLoading(true);
+
     try {
-      // Send the query to the backend
       const response = await axios.post('http://localhost:5000/api/query', { query });
-
-      // Check for errors in the response
-      if (response.data.error) {
-        throw new Error(response.data.error);
-      }
-
-      // Destructure the response data
       const { gpt_response, sql_result } = response.data;
 
-      // Prepare messages for the chat history
-      const gptMessage = { type: 'bot', text: gpt_response || 'No response from GPT-Neo' };
-      const sqlMessages = sql_result
-        ? [{ type: 'bot', text: `SQL Result:\n${JSON.stringify(sql_result, null, 2)}` }]
+      const gptMessage = { type: 'bot', text: gpt_response || 'No response from GPT' };
+      const sqlMessages = sql_result && Array.isArray(sql_result) 
+        ? [{ type: 'bot', content: sql_result }] 
         : [];
 
-      // Update the chat history with the new messages
       setChatHistory([...chatHistory, newMessage, gptMessage, ...sqlMessages]);
-
     } catch (error) {
-      console.error('Error fetching response from backend', error);
-
-      // Prepare an error message
-      const errorMessage = { type: 'bot', text: error.message || 'Error fetching response. Please try again.' };
+      const errorMessage = { type: 'bot', text: 'Error fetching response. Please try again.' };
       setChatHistory([...chatHistory, newMessage, errorMessage]);
     }
 
-    // Clear the input field
+    setLoading(false);
     setQuery('');
   };
 
-  // Function to handle "Enter" key press
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       sendQuery();
     }
   };
 
+  const renderTable = (data) => {
+    if (!data || data.length === 0) return null;
+
+    const keys = Object.keys(data[0]);
+
+    return (
+      <table className="sql-result-table">
+        <thead>
+          <tr>
+            {keys.map((key) => (
+              <th key={key}>{key}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, index) => (
+            <tr key={index}>
+              {keys.map((key) => (
+                <td key={key}>{row[key]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   return (
     <div className="app">
+      <header className="app-header">
+        <h2>Customer Support Chatbot</h2>
+      </header>
+
       <div className="chat-box">
+        {loading && <div className="typing-indicator">Bot is typing...</div>}
         {chatHistory.map((message, index) => (
           <div
             key={index}
             className={`message ${message.type === 'user' ? 'user-message' : 'bot-message'}`}
           >
             {message.text}
+            {message.content && renderTable(message.content)}
           </div>
         ))}
       </div>
@@ -76,7 +95,7 @@ const App = () => {
           onChange={(e) => setQuery(e.target.value)}
           onKeyPress={handleKeyPress}
         />
-        <button onClick={sendQuery}>
+        <button onClick={sendQuery} disabled={loading}>
           <FaPaperPlane />
         </button>
       </div>
