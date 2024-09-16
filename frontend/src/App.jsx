@@ -12,7 +12,7 @@ const App = () => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const result = await axios.get('http://localhost:5000/api/chat-history');
+        const result = await axios.get('http://https://salessense-ai.onrender.com:5000/api/chat-history');
         setChatHistory(result.data);
       } catch (error) {
         console.error('Error fetching chat history:', error);
@@ -28,7 +28,7 @@ const App = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/query', { query });
+      const response = await axios.post('http://https://salessense-ai.onrender.com:5000/api/query', { query });
       const { sql_result } = response.data;
 
       const sqlResultString = JSON.stringify(sql_result);
