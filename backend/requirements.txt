@@ -1,6 +1,5 @@
 flask
 flask-cors
-sqlite3
 transformers
 torch
 python-dotenv
