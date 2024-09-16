@@ -8,7 +8,6 @@ ENV FLASK_RUN_HOST=0.0.0.0
 
 # Install dependencies
 WORKDIR /app
-COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy the application code
