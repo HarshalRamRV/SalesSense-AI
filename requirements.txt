@@ -1,5 +1,6 @@
 flask
-langchain
-openai
-sqlalchemy
+flask-cors
+sqlite3
+transformers
+torch
 python-dotenv
