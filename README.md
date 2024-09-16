@@ -1,4 +1,4 @@
-# Customer Support Chatbot for Retail Analytics
+# SalesSense-AI: Customer Support Chatbot for Retail Analytics
 
 ## Overview
 This project is a fully functional customer support chatbot designed to integrate with a retail analytics platform. It enables users to interact with the chatbot to query sales data and receive insights. The chatbot utilizes a Large Language Model (LLM) for natural language understanding and interacts with a SQL database for structured data retrieval.
