@@ -14,7 +14,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_path)
 # Function to execute a query and return results as JSON
 def query_db(query):
     try:
-        conn = sqlite3.connect('../app/database/sales.db')
+        conn = sqlite3.connect('../database/sales.db')
         conn.row_factory = sqlite3.Row  # To return rows as dictionaries
         cursor = conn.cursor()
         cursor.execute(query)
@@ -31,7 +31,7 @@ from datetime import datetime
 def insert_chat_history(user_message, bot_message):
     try:
         # Connect to the SQLite database
-        conn = sqlite3.connect('../app/database/sales.db')
+        conn = sqlite3.connect('../database/sales.db')
         cursor = conn.cursor()
         
         # Get the current timestamp
@@ -95,7 +95,7 @@ def generate_sql_and_fetch_data():
 @app.route('/api/chat-history', methods=['GET'])
 def get_chat_history():
     try:
-        conn = sqlite3.connect('../app/database/sales.db')
+        conn = sqlite3.connect('../database/sales.db')
         cursor = conn.cursor()
         cursor.execute('SELECT user_message, bot_message, timestamp FROM chat_history ORDER BY timestamp ASC')
         history = cursor.fetchall()
