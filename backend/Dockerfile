@@ -5,17 +5,15 @@ FROM python:3.10-slim
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy only requirements.txt first for better caching
-COPY requirements.txt .
-
-# Install Python dependencies
+# Install dependencies
+COPY requirements.txt ./
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Now copy the rest of the application code
+# Copy the application code
 COPY . .
 
 # Expose the port the app runs on
