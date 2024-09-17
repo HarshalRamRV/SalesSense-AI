@@ -15,9 +15,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy the database folder
-COPY ../database ./database
-
 # Now copy the rest of the application code
 COPY . .
 
