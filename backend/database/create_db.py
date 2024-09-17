@@ -15,13 +15,24 @@ try:
         )
     ''')
 
-    # Create chat_history table
+    # Create chat_history table with user_id
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS chat_history (
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            user_id TEXT, 
             user_message TEXT, 
             bot_message TEXT, 
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Create users table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            username TEXT UNIQUE, 
+            password TEXT, 
+            email TEXT UNIQUE
         )
     ''')
 
@@ -54,12 +65,6 @@ try:
         VALUES (?, ?, ?, ?)
     ''', sales_data)
 
-    # cursor.execute('''
-    #     DROP TABLE sales;
-    # ''')
-    # cursor.execute('''
-    #     delete fromchat_history where user_message = 'Hello' ;
-    #  ''')
     conn.commit()
     print("Sales data inserted successfully!")
 except sqlite3.Error as e:
