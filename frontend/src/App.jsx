@@ -9,13 +9,14 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
 
-  const chatBoxRef = useRef(null); // Ref for the chat box
-  const latestMessageRef = useRef(null); // Ref for the latest message
+  const chatBoxRef = useRef(null);
+  const latestMessageRef = useRef(null);
 
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const result = await axios.get('http://localhost:5000/api/chat-history');
+        const result = await axios.get('https://salessense-ai.onrender.com/api/chat-history');
+        console.log(result.data)
         setChatHistory(result.data);
       } catch (error) {
         console.error('Error fetching chat history:', error);
@@ -26,7 +27,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // Smooth scroll to the latest message when chat history updates
     if (latestMessageRef.current) {
       latestMessageRef.current.scrollIntoView({ behavior: 'smooth' });
     }
@@ -38,7 +38,7 @@ const App = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/query', { query });
+      const response = await axios.post('https://salessense-ai.onrender.com/api/query', { query });
       const { sql_result } = response.data;
 
       const sqlResultString = JSON.stringify(sql_result);
@@ -51,6 +51,7 @@ const App = () => {
         sqlMessages: sql_result || []
       });
     } catch (error) {
+      console.error('Error sending query:', error);
       setResponse({
         sqlMessages: []
       });
@@ -111,12 +112,12 @@ const App = () => {
               <div className="message bot-message">
                 {(() => {
                   try {
-                    const cleanedMessage = chat.bot_message.replace(/'/g, '"'); // Replace single quotes with double quotes
+                    const cleanedMessage = chat.bot_message.replace(/'/g, '"');
                     const parsedMessage = JSON.parse(cleanedMessage);
                     return Array.isArray(parsedMessage) ? renderTable(parsedMessage) : parsedMessage;
                   } catch (error) {
                     console.error('Error parsing bot message:', error);
-                    return chat.bot_message; // Display the raw message if parsing fails
+                    return chat.bot_message;
                   }
                 })()}
                 <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
