@@ -13,8 +13,8 @@
   width: 100%;
   background-color: #00bcd4;
   color: white;
-  text-align: center;
-  padding: 0px;
+  text-align: left;
+  padding-left:1rem;
   margin: 0px;
   z-index: 1;
 }

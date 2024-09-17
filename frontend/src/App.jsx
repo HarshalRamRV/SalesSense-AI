@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FaPaperPlane } from 'react-icons/fa';
 import './App.css';
@@ -8,6 +8,9 @@ const App = () => {
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
+
+  const chatBoxRef = useRef(null); // Ref for the chat box
+  const latestMessageRef = useRef(null); // Ref for the latest message
 
   useEffect(() => {
     const fetchChatHistory = async () => {
@@ -21,6 +24,13 @@ const App = () => {
 
     fetchChatHistory();
   }, []);
+
+  useEffect(() => {
+    // Smooth scroll to the latest message when chat history updates
+    if (latestMessageRef.current) {
+      latestMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatHistory]);
 
   const sendQuery = async () => {
     if (!query) return;
@@ -89,9 +99,9 @@ const App = () => {
         <h2>Customer Support Chatbot</h2>
       </header>
 
-      <div className="chat-box">
+      <div className="chat-box" ref={chatBoxRef}>
         {chatHistory.map((chat, index) => (
-          <div key={index} className="message-container">
+          <div key={index} className="message-container" ref={index === chatHistory.length - 1 ? latestMessageRef : null}>
             <div className="message user-message">
               {chat.user_message}
               <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
