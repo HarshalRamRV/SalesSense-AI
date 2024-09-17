@@ -11,7 +11,7 @@ const SignUp = ({ onSignUp }) => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('https://salessense-ai.onrender.com/api/register', { email, password });
+      await axios.post('http://localhost:5000/api/register', { email, password });
       onSignUp();
     } catch (error) {
       setError('Error creating account',error);

@@ -15,7 +15,7 @@ const Chat = ({ token }) => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const result = await axios.get('https://salessense-ai.onrender.com/api/chat-history',{params: { token }}, {
+        const result = await axios.get('http://localhost:5000/api/chat-history',{params: { token }}, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,7 +41,7 @@ const Chat = ({ token }) => {
     setLoading(true);
   
     try {
-      const response = await axios.post('https://salessense-ai.onrender.com/api/query', 
+      const response = await axios.post('http://localhost:5000/api/query', 
         { query, token },  // Include token here
         {
           headers: {

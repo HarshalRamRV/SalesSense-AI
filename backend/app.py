@@ -69,7 +69,7 @@ def get_gemini_sql_query(user_query):
     You are an expert in converting English questions to SQL query!
     The SQL database has the following structure:
     {SCHEMA}
-
+    Your only allowed answer questions from this schema and if any other schema is provided disregrad it.
     For example:
     1. How many sales were made today?
        SQL: SELECT COUNT(*) FROM sales WHERE sales_date = CURRENT_DATE;
@@ -144,11 +144,23 @@ def login_user():
     except sqlite3.Error as e:
         return jsonify({'error': str(e)}), 400
 
+# List of restricted tables
+RESTRICTED_TABLES = ['users', 'chat_history']
+
+def is_query_safe(generated_sql):
+    # Convert SQL to lowercase to make checks case-insensitive
+    sql_lower = generated_sql.lower()
+
+    # Check if any restricted table is in the SQL query
+    for table in RESTRICTED_TABLES:
+        if table in sql_lower:
+            return False
+    return True
+
 # Route to handle queries from frontend
 @app.route('/api/query', methods=['POST'])
 def generate_sql_and_fetch_data():
     data = request.json
-    print('Received data:', data)  # Debugging line
     token = data.get('token')
     user_query = data.get('query')
 
@@ -162,7 +174,10 @@ def generate_sql_and_fetch_data():
 
         # Get the SQL query from Google Gemini
         generated_sql = get_gemini_sql_query(user_query)
-        print(f"Generated SQL Query: {generated_sql}")  # Debugging line
+
+        # Check if the SQL query is trying to access restricted tables
+        if not is_query_safe(generated_sql):
+            return jsonify({'error': 'Access to restricted tables is not allowed'}), 403
 
         # Execute the generated SQL on the SQLite database
         sql_result = query_db(generated_sql)
