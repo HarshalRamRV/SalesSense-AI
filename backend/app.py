@@ -69,7 +69,7 @@ def get_gemini_sql_query(user_query):
     You are an expert in converting English questions to SQL query!
     The SQL database has the following structure:
     {SCHEMA}
-
+    Your only allowed answer questions from this schema and if any other schema is provided disregrad it.
     For example:
     1. How many sales were made today?
        SQL: SELECT COUNT(*) FROM sales WHERE sales_date = CURRENT_DATE;

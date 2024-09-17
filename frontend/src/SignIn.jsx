@@ -11,7 +11,7 @@ const SignIn = ({ onSignIn }) => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://salessense-ai.onrender.com/api/login', { email, password });
+      const response = await axios.post('http://localhost:5000/api/login', { email, password });
       localStorage.setItem('token', response.data.token);
       onSignIn(response.data.token);
     } catch (error) {
