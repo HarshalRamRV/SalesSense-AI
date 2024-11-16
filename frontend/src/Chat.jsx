@@ -1,11 +1,11 @@
-import PropTypes from 'prop-types';
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { FaPaperPlane } from 'react-icons/fa';
-import './Chat.css';
+import PropTypes from "prop-types";
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { FaPaperPlane } from "react-icons/fa";
+import "./Chat.css";
 
 const Chat = ({ token }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
 
@@ -15,14 +15,23 @@ const Chat = ({ token }) => {
   useEffect(() => {
     const fetchChatHistory = async () => {
       try {
-        const result = await axios.get('http://localhost:5000/api/chat-history',{params: { token }}, {
+        const token = localStorage.getItem("token"); // or however you store your token
+        const response = await fetch("http://localhost:5000/api/chat-history", {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         });
-        setChatHistory(result.data);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch chat history");
+        }
+
+        const data = await response.json();
+        setChatHistory(data);
       } catch (error) {
-        console.error('Error fetching chat history:', error);
+        console.error("Error fetching chat history:", error);
+        // Handle error appropriately (e.g., show error message to user)
       }
     };
 
@@ -31,44 +40,50 @@ const Chat = ({ token }) => {
 
   useEffect(() => {
     if (latestMessageRef.current) {
-      latestMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+      latestMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatHistory]);
 
   const sendQuery = async () => {
     if (!query) return;
-  
+
     setLoading(true);
-  
+
     try {
-      const response = await axios.post('http://localhost:5000/api/query', 
-        { query, token },  // Include token here
+      const response = await axios.post(
+        "http://localhost:5000/api/query",
+        { query, token }, // Include token here
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'  // Ensure the content type is correct
+            "Content-Type": "application/json", // Ensure the content type is correct
           },
         }
       );
       const { sql_result } = response.data;
       const sqlResultString = JSON.stringify(sql_result);
-  
+
       setChatHistory((prevHistory) => [
         ...prevHistory,
-        { user_message: query, bot_message: sqlResultString, timestamp: new Date().toISOString() }
+        {
+          user_message: query,
+          bot_message: sqlResultString,
+          timestamp: new Date().toISOString(),
+        },
       ]);
     } catch (error) {
-      console.error('Error sending query:', error.response ? error.response.data : error.message);
+      console.error(
+        "Error sending query:",
+        error.response ? error.response.data : error.message
+      );
     }
-  
+
     setLoading(false);
-    setQuery('');
+    setQuery("");
   };
-  
-  
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       sendQuery();
     }
   };
@@ -104,10 +119,16 @@ const Chat = ({ token }) => {
     <div className="chat">
       <div className="chat-box" ref={chatBoxRef}>
         {chatHistory.map((chat, index) => (
-          <div key={index} className="message-container" ref={index === chatHistory.length - 1 ? latestMessageRef : null}>
+          <div
+            key={index}
+            className="message-container"
+            ref={index === chatHistory.length - 1 ? latestMessageRef : null}
+          >
             <div className="message user-message">
               {chat.user_message}
-              <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
+              <div className="message-timestamp">
+                {new Date(chat.timestamp).toLocaleString()}
+              </div>
             </div>
 
             {chat.bot_message && (
@@ -116,13 +137,17 @@ const Chat = ({ token }) => {
                   try {
                     const cleanedMessage = chat.bot_message.replace(/'/g, '"');
                     const parsedMessage = JSON.parse(cleanedMessage);
-                    return Array.isArray(parsedMessage) ? renderTable(parsedMessage) : parsedMessage;
+                    return Array.isArray(parsedMessage)
+                      ? renderTable(parsedMessage)
+                      : parsedMessage;
                   } catch (error) {
-                    console.error('Error parsing bot message:', error);
+                    console.error("Error parsing bot message:", error);
                     return chat.bot_message;
                   }
                 })()}
-                <div className="message-timestamp">{new Date(chat.timestamp).toLocaleString()}</div>
+                <div className="message-timestamp">
+                  {new Date(chat.timestamp).toLocaleString()}
+                </div>
               </div>
             )}
           </div>

@@ -5,17 +5,25 @@ This project is a fully functional customer support chatbot designed to integrat
 
 ## Features
 - **User-Friendly Web Interface**: Responsive design for both desktop and mobile devices with chat history, typing indicators, and a minimalistic design.
-- **Backend Integration**: Handles communication between the chatbot, SQL database, and the LLM.
+- **Express.js Backend**: RESTful API built with Express.js for efficient request handling, middleware support, and robust error handling.
 - **SQL Database Management**: Stores sales data, product information, and customer queries with optimized SQL queries.
 - **RESTful API**: Provides endpoints for querying sales data, retrieving chat history, and interacting with the LLM.
-- **LLM Integration**: Uses an open-source LLM to handle natural language queries and augment responses with SQL data.
+- **Google Gemini Integration**: Leverages Gemini 1.5 Flash for fast, accurate natural language understanding and SQL query generation.
+
+## Technical Stack
+- Frontend: React + Vite
+- Backend: Express.js
+- Database: SQLite
+- LLM: Google Gemini 1.5 Flash
+- API: RESTful architecture
 
 ## Installation
 
 ### Prerequisites
-- Node.js and npm (for frontend)
-- Python 3.x (for backend)
+- Node.js and npm (for frontend and backend)
+- Python 3.x (for database setup)
 - SQLite (for database)
+- Google Cloud API key (for Gemini access)
 - Access to a cloud platform (for deployment)
 
 ### Frontend Setup

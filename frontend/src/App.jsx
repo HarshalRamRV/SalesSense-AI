@@ -28,7 +28,7 @@ const App = () => {
     <Router>
       <div className="app">
         <header className="app-header">
-          <h2>Customer Support Chatbot</h2>
+          <h2>SalesSense AI</h2>
           {token && <button className="logout-btn" onClick={handleLogout}>Logout</button>}
         </header>
 
