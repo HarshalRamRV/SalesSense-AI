@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Google Generative AI with your API key from environment variables
-const genAI = new GoogleGenerativeAI('AIzaSyDOrqDq4xNWx9kByuCX22cRES0w3TXBjnQ');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function queryLLM(message) {
