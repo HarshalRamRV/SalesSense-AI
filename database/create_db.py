@@ -3,7 +3,7 @@ import sqlite3
 def create_database():
     try:
         # Connect to the SQLite database
-        conn = sqlite3.connect('C:/Users/backs/self Dropbox/HARSHAL RAM R V/PC/Documents/SalesSense-AI/backend/database1.db')
+        conn = sqlite3.connect('C:/Users/backs/self Dropbox/HARSHAL RAM R V/PC/Documents/SalesSense-AI/backend/database/database1.db')
         cursor = conn.cursor()
 
         # Enforce foreign key constraints
